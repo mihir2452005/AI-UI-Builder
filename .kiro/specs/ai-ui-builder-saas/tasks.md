@@ -90,14 +90,14 @@ This implementation plan breaks down the AI-Powered UI Builder SaaS MVP into dis
     - _Requirements: 13.6, 13.8_
 
 - [ ] 4. Core Type Definitions and Schema
-  - [~] 4.1 Create UI Schema TypeScript types
+  - [x] 4.1 Create UI Schema TypeScript types
     - Define UIDocument, ComponentNode, DesignTokens, ResponsiveStyles interfaces
     - Define ComponentType enum with all 20 component types (Container, Flex, Grid, Stack, Text, Heading, Image, Icon, Button, Input, Textarea, Select, Checkbox, Radio, Nav, Link, Card, Hero, Feature, Footer)
     - Define ComponentProps, StyleObject, and metadata interfaces
     - Define PromptHistoryEntry interface for tracking prompt iterations
     - _Requirements: 1.2, 1.6, 2.3, 4.1, 18.1_
   
-  - [~] 4.2 Create API response types
+  - [x] 4.2 Create API response types
     - Define ApiResponse<T> generic type with success/error structure
     - Define ApiError with code, message, and details fields
     - Define GenerateUIRequest with prompt, projectId, and preserveManualEdits fields
@@ -107,7 +107,7 @@ This implementation plan breaks down the AI-Powered UI Builder SaaS MVP into dis
     - Define SuggestImprovementsRequest and SuggestImprovementsResponse types
     - _Requirements: 1.1, 1.3, 7.2, 9.1, 14.2_
   
-  - [~] 4.3 Create validation schemas using Zod
+  - [x] 4.3 Create validation schemas using Zod
     - Define UIDocumentSchema with full validation for all nested structures
     - Define GenerateUISchema validating prompt (1-1000 chars), projectId, preserveManualEdits
     - Define SaveProjectSchema validating name (1-100 chars), description (max 500 chars)
