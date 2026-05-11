@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Test files
+**/__tests__/**
+**/*.test.ts
+**/*.test.tsx
+**/manual-test.ts
+
+# Example files
+**/examples.ts
+
+# Build outputs
+.next/
+.vercel/
+.turbo/
+
+# Environment files
+.env
+.env.local
+.env.production.local
+.env.development.local
+
+# Generated files
+*.tsbuildinfo

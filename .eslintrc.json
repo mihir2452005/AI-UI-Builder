@@ -10,11 +10,25 @@
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "react-hooks/exhaustive-deps": "warn",
-    "no-console": ["warn", { "allow": ["warn", "error"] }]
+    "no-console": ["warn", { "allow": ["warn", "error", "info"] }]
   },
   "overrides": [
     {
-      "files": ["**/__tests__/**/*", "**/*.test.ts", "**/*.test.tsx", "**/examples.ts"],
+      "files": [
+        "**/__tests__/**/*.ts",
+        "**/__tests__/**/*.tsx",
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/examples.ts",
+        "**/manual-test.ts"
+      ],
+      "rules": {
+        "no-console": "off",
+        "@typescript-eslint/no-explicit-any": "off"
+      }
+    },
+    {
+      "files": ["lib/auth/auth-options.ts"],
       "rules": {
         "no-console": "off"
       }
