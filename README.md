@@ -2,20 +2,43 @@
 
 An AI-powered platform that enables students, freshers, and beginner frontend developers to create production-ready user interfaces through natural language descriptions, visual customization, and AI-assisted design.
 
-## Features
+## 🎯 Project Status
+
+**Current Phase:** Authentication System Complete ✅  
+**Progress:** 5/106 tasks completed (4.7%)  
+**Next Phase:** Core Type Definitions & State Management
+
+### ✅ Completed Features
+
+- ✅ Next.js 14 project setup with TypeScript and App Router
+- ✅ PostgreSQL database with Prisma ORM
+- ✅ Complete authentication system (Email, Google, GitHub)
+- ✅ Authentication UI pages (sign-in, sign-up, error handling)
+- ✅ Database migrations and schema
+- ✅ Comprehensive documentation
+
+### 🚧 In Development
+
+- Core type definitions (UI Schema, API types)
+- State management with Zustand
+- AI Prompt Engine
+- Canvas workspace
+- Component library
+
+## 🚀 Features (Planned)
 
 - 🤖 **AI Prompt-to-UI Generation** - Describe UIs in natural language
 - ✏️ **Editable Prompt Layer** - Iteratively refine generated UIs
 - 🎨 **Drag-and-Drop Canvas** - Visual component manipulation
 - 📱 **Responsive Preview** - Multi-device preview system
 - 🎯 **Grid & Spacing Controls** - Visual layout alignment
-- 📦 **Component Library** - Pre-built components
+- 📦 **Component Library** - ~20 pre-built components
 - 💾 **Code Export** - HTML, React, and Tailwind CSS export
 - 💡 **AI Suggestions** - Design improvement recommendations
 - 🎨 **Design Tokens** - Consistent styling system
-- 👤 **Authentication** - Email, Google, and GitHub login
+- 👤 **Authentication** - Email, Google, and GitHub login ✅
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 - **Frontend**: Next.js 14+ (App Router), React 18+, Tailwind CSS 3.4+
 - **State Management**: Zustand 4.x
@@ -23,127 +46,262 @@ An AI-powered platform that enables students, freshers, and beginner frontend de
 - **Animation**: Framer Motion 11.x
 - **Code Editor**: Monaco Editor
 - **Database**: PostgreSQL 15+ with Prisma 5.x ORM
-- **Authentication**: NextAuth.js 4.x
+- **Authentication**: NextAuth.js 4.x ✅
 - **Caching**: Redis (Upstash)
-- **AI Services**: Centralized AI provider (OpenAI OR Anthropic) configured by platform owner
+- **AI Services**: OpenAI GPT-4 OR Anthropic Claude 3 Sonnet
 - **Deployment**: Vercel
 
-## Getting Started
+## 📚 Documentation
+
+### Setup Guides
+- **[QUICK_START.md](QUICK_START.md)** - Get started in 15 minutes
+- **[ENV_SETUP_GUIDE.md](ENV_SETUP_GUIDE.md)** - Complete environment setup
+- **[DATABASE_SETUP_COMPLETE.md](DATABASE_SETUP_COMPLETE.md)** - Database configuration
+
+### Deployment
+- **[VERCEL_DEPLOYMENT_GUIDE.md](VERCEL_DEPLOYMENT_GUIDE.md)** - Full deployment guide
+- **[VERCEL_QUICK_DEPLOY.md](VERCEL_QUICK_DEPLOY.md)** - Quick deployment (15 min)
+- **[DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)** - Verification checklist
+
+### OAuth Setup
+- **[GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md)** - Google OAuth configuration
+- **[GOOGLE_OAUTH_QUICK_GUIDE.md](GOOGLE_OAUTH_QUICK_GUIDE.md)** - Quick reference
+
+### Project Status
+- **[IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md)** - Detailed progress report
+- **[.kiro/specs/ai-ui-builder-saas/](/.kiro/specs/ai-ui-builder-saas/)** - Complete specifications
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
 - Node.js 18+ and npm
-- Docker and Docker Compose (for local database)
-- Redis (optional, for caching)
+- PostgreSQL 15+ (local or Supabase)
+- Redis (Upstash for caching)
+- Google OAuth credentials
+- GitHub OAuth credentials
+- OpenAI or Anthropic API key
 
-### Installation
+### Quick Setup (15 minutes)
 
-1. Clone the repository:
+1. **Clone the repository:**
 ```bash
-git clone <repository-url>
-cd ai-ui-builder-saas
+git clone https://github.com/mihir2452005/AI-UI-Builder.git
+cd AI-UI-Builder
 ```
 
-2. Install dependencies:
+2. **Install dependencies:**
 ```bash
 npm install
 ```
 
-3. Set up environment variables:
+3. **Set up environment variables:**
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` and add your configuration values.
+Follow **[QUICK_START.md](QUICK_START.md)** for detailed setup instructions.
 
-4. Set up the database:
+4. **Set up the database:**
 
-**Option A: Automated Setup (Recommended)**
+**Local PostgreSQL:**
 ```bash
-npm run db:setup
+# Run the setup script
+.\setup-db.ps1
+
+# Or manually:
+psql -U postgres
+CREATE DATABASE ai_ui_builder;
+\q
 ```
 
-This will:
-- Start PostgreSQL in Docker
-- Create the database schema
-- Run initial migrations
-- Generate Prisma Client
+**Or use Supabase** (recommended for production) - see [ENV_SETUP_GUIDE.md](ENV_SETUP_GUIDE.md)
 
-**Option B: Manual Setup**
+5. **Run migrations:**
 ```bash
-# Start PostgreSQL container
-docker-compose up -d
-
-# Run migrations
-npm run db:migrate
-
-# Generate Prisma Client
-npm run db:generate
+npx prisma generate
+npx prisma migrate dev --name init
 ```
 
-5. Run the development server:
+6. **Start development server:**
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser.
+Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-### Database Management
+### Testing Authentication
 
-- `npm run db:setup` - Automated database setup (Docker + migrations)
-- `npm run db:migrate` - Create and apply new migrations
-- `npm run db:studio` - Open Prisma Studio (database GUI)
-- `npm run db:generate` - Generate Prisma Client
-- `npm run db:reset` - Reset database (WARNING: deletes all data)
+1. Visit http://localhost:3000/auth/signin
+2. Try signing in with:
+   - Google OAuth
+   - GitHub OAuth
+   - Email/password (create account first)
 
-For more details, see [prisma/MIGRATION_GUIDE.md](prisma/MIGRATION_GUIDE.md).
-
-## Project Structure
+## 📁 Project Structure
 
 ```
-├── app/                 # Next.js App Router pages
-├── components/          # React components
-│   ├── canvas/         # Canvas workspace
-│   ├── editor/         # Editor layout
-│   ├── properties/     # Properties panel
-│   ├── library/        # Component library
-│   ├── prompt/         # Prompt editor
-│   ├── preview/        # Responsive preview
-│   ├── export/         # Code export
-│   ├── suggestions/    # AI suggestions
-│   ├── tokens/         # Design tokens
-│   └── ui/             # Shared UI components
-├── lib/                # Utilities and services
-│   ├── ai/            # AI prompt engine
-│   ├── services/      # External services
-│   ├── utils/         # Utility functions
-│   ├── db/            # Database utilities
-│   ├── auth/          # Authentication
-│   ├── export/        # Code export engine
-│   └── validation/    # Zod schemas
-├── stores/            # Zustand state management
-├── types/             # TypeScript type definitions
-└── prisma/            # Database schema
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   │   └── auth/         # Authentication endpoints ✅
+│   ├── auth/             # Auth pages (signin, signup) ✅
+│   ├── layout.tsx        # Root layout ✅
+│   └── page.tsx          # Home page ✅
+├── components/            # React components
+│   ├── canvas/           # Canvas workspace (planned)
+│   ├── editor/           # Editor layout (planned)
+│   ├── properties/       # Properties panel (planned)
+│   ├── library/          # Component library (planned)
+│   └── ui/               # Shared UI components (planned)
+├── lib/                  # Utilities and services
+│   ├── auth/            # Authentication logic ✅
+│   ├── db/              # Database utilities ✅
+│   ├── ai/              # AI prompt engine (planned)
+│   └── export/          # Code export engine (planned)
+├── stores/              # Zustand state management (planned)
+├── types/               # TypeScript definitions ✅
+├── prisma/              # Database schema ✅
+│   ├── schema.prisma   # Prisma schema ✅
+│   └── migrations/     # Database migrations ✅
+└── .kiro/              # Spec files
+    └── specs/          # Feature specifications
 ```
 
-## Scripts
+## 🔧 Available Scripts
 
+### Development
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
-- `npm run format` - Format code with Prettier
-- `npm run type-check` - Run TypeScript type checking
+- `npm run type-check` - TypeScript type checking
 
-### Database Scripts
+### Database
+- `npx prisma generate` - Generate Prisma Client
+- `npx prisma migrate dev` - Create and apply migrations
+- `npx prisma studio` - Open Prisma Studio (database GUI)
+- `npx prisma migrate reset` - Reset database (⚠️ deletes all data)
 
-- `npm run db:setup` - Automated database setup (Docker + migrations)
-- `npm run db:migrate` - Create and apply new migrations
-- `npm run db:migrate:deploy` - Apply migrations in production
-- `npm run db:studio` - Open Prisma Studio (database GUI)
-- `npm run db:generate` - Generate Prisma Client
-- `npm run db:reset` - Reset database (WARNING: deletes all data)
+## 🔐 Environment Variables
 
-## License
+Required environment variables (see [ENV_SETUP_GUIDE.md](ENV_SETUP_GUIDE.md)):
 
-MIT
+```env
+# Database
+DATABASE_URL="postgresql://..."
+
+# NextAuth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret-key"
+
+# OAuth Providers
+GOOGLE_CLIENT_ID="..."
+GOOGLE_CLIENT_SECRET="..."
+GITHUB_CLIENT_ID="..."
+GITHUB_CLIENT_SECRET="..."
+
+# AI Provider (choose one)
+AI_PROVIDER="openai"
+OPENAI_API_KEY="sk-..."
+# OR
+# AI_PROVIDER="anthropic"
+# ANTHROPIC_API_KEY="sk-ant-..."
+
+# Redis Cache
+REDIS_URL="https://...upstash.io"
+REDIS_TOKEN="..."
+
+# Vercel Blob Storage (optional)
+BLOB_READ_WRITE_TOKEN="..."
+```
+
+## 🚀 Deployment
+
+### Deploy to Vercel
+
+1. Push your code to GitHub
+2. Import project to Vercel
+3. Set up production database (Supabase recommended)
+4. Configure environment variables
+5. Deploy!
+
+See **[VERCEL_DEPLOYMENT_GUIDE.md](VERCEL_DEPLOYMENT_GUIDE.md)** for detailed instructions.
+
+### Quick Deploy (15 minutes)
+
+Follow **[VERCEL_QUICK_DEPLOY.md](VERCEL_QUICK_DEPLOY.md)** for a fast deployment path.
+
+## 📊 Development Roadmap
+
+### Phase 1: Foundation ✅ (Complete)
+- [x] Project setup
+- [x] Database schema
+- [x] Authentication system
+- [x] Authentication UI
+- [x] Documentation
+
+### Phase 2: Core Types (In Progress)
+- [ ] UI Schema TypeScript types
+- [ ] API response types
+- [ ] Validation schemas (Zod)
+
+### Phase 3: State Management
+- [ ] Canvas store (Zustand)
+- [ ] Project store
+- [ ] UI store
+
+### Phase 4: AI Engine
+- [ ] AI model integration
+- [ ] Prompt engine
+- [ ] Context-aware generation
+
+### Phase 5: Canvas & Editor
+- [ ] Component renderer
+- [ ] Drag-and-drop system
+- [ ] Properties panel
+- [ ] Component library
+
+### Phase 6: Code Export
+- [ ] HTML export
+- [ ] React export
+- [ ] Tailwind export
+
+### Phase 7: Advanced Features
+- [ ] AI suggestions
+- [ ] Design tokens
+- [ ] Responsive preview
+
+### Phase 8: Polish & Deploy
+- [ ] Testing
+- [ ] Performance optimization
+- [ ] Production deployment
+
+## 🤝 Contributing
+
+This is currently a solo project in active development. Contributions will be welcome once the MVP is complete.
+
+## 📝 License
+
+MIT License - see LICENSE file for details
+
+## 👤 Author
+
+**Mihir Patel**
+- GitHub: [@mihir2452005](https://github.com/mihir2452005)
+- Email: mihir2452005@gmail.com
+
+## 🙏 Acknowledgments
+
+- Next.js team for the amazing framework
+- Vercel for hosting and deployment
+- Prisma for the excellent ORM
+- NextAuth.js for authentication
+- OpenAI/Anthropic for AI capabilities
+
+---
+
+**Status:** 🚧 In Active Development  
+**Version:** 0.1.0 (MVP Phase 1 Complete)  
+**Last Updated:** 2024
+
+For detailed setup instructions, see [QUICK_START.md](QUICK_START.md) or [ENV_SETUP_GUIDE.md](ENV_SETUP_GUIDE.md).
