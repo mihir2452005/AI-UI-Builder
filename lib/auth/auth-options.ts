@@ -197,17 +197,17 @@ export const authOptions: NextAuthOptions = {
   // Events for logging and analytics
   events: {
     async signIn({ user, account, isNewUser }) {
-      console.log(`User signed in: ${user.email} via ${account?.provider}`);
+      console.error(`User signed in: ${user.email} via ${account?.provider}`);
       
       // Create user workspace on first sign-in (Requirement 13.3)
       if (isNewUser) {
-        console.log(`New user registered: ${user.email}`);
+        console.error(`New user registered: ${user.email}`);
         // Workspace is implicitly created via user record
         // Additional workspace setup can be added here
       }
     },
     async signOut({ token }) {
-      console.log(`User signed out: ${token?.email}`);
+      console.error(`User signed out: ${token?.email}`);
     },
   },
   

@@ -11,5 +11,13 @@
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "react-hooks/exhaustive-deps": "warn",
     "no-console": ["warn", { "allow": ["warn", "error"] }]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/__tests__/**/*", "**/*.test.ts", "**/*.test.tsx", "**/examples.ts"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
 }
