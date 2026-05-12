@@ -11,10 +11,9 @@ const customJestConfig = {
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
-    '^nanoid$': require.resolve('nanoid'),
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(nanoid)/)',
+    'node_modules/(?!(nanoid|fast-check)/)',
   ],
   testMatch: [
     '**/__tests__/**/*.test.ts',

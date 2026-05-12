@@ -19,7 +19,7 @@
  */
 
 import { nanoid } from 'nanoid';
-import type { UIDocument, PromptHistoryEntry } from '@/types/ui-schema';
+import type { UIDocument, PromptHistoryEntry, ComponentNode } from '@/types/ui-schema';
 import { UIDocumentSchema } from '@/lib/validation/schemas';
 import { createAIModel } from './models';
 import type { AIModel } from './models';
@@ -178,6 +178,8 @@ export class PromptEngine {
    * 
    * Requirements:
    * - 25.5: Retry logic with exponential backoff (3 attempts)
+   * - 29.1: User-friendly error messages
+   * - 29.5: Log generation attempts and errors
    */
   private async callAIWithRetry(
     systemPrompt: string,
@@ -188,6 +190,14 @@ export class PromptEngine {
     
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
+        // Log attempt
+        console.log('AI Generation Attempt:', {
+          timestamp: new Date().toISOString(),
+          attempt: attempt + 1,
+          maxRetries,
+          promptLength: userPrompt.length,
+        });
+        
         const response = await this.aiModel.complete({
           system: systemPrompt,
           user: userPrompt,
@@ -195,26 +205,62 @@ export class PromptEngine {
           maxTokens: 4000,
         });
         
+        // Log success
+        console.log('AI Generation Attempt Success:', {
+          timestamp: new Date().toISOString(),
+          attempt: attempt + 1,
+          tokensUsed: response.tokensUsed,
+          model: response.model,
+        });
+        
         return response;
       } catch (error) {
         lastError = error as Error;
         
-        // Log error for monitoring
-        console.error(
-          `AI request failed (attempt ${attempt + 1}/${maxRetries}):`,
-          error
-        );
+        // Log error with detailed information
+        console.error('AI Generation Attempt Failed:', {
+          timestamp: new Date().toISOString(),
+          attempt: attempt + 1,
+          maxRetries,
+          error: {
+            name: lastError.name,
+            message: lastError.message,
+            stack: process.env.NODE_ENV === 'development' ? lastError.stack : undefined,
+          },
+          willRetry: attempt < maxRetries - 1,
+        });
         
-        // If this is the last attempt, throw the error
+        // If this is the last attempt, throw a user-friendly error
         if (attempt === maxRetries - 1) {
-          throw new Error(
-            `AI service failed after ${maxRetries} attempts: ${lastError.message}`
-          );
+          // Enhance error message for better user experience
+          const errorMsg = lastError.message;
+          
+          if (errorMsg.includes('rate limit')) {
+            throw new Error(
+              'AI service rate limit exceeded. Please try again in a few minutes.'
+            );
+          } else if (errorMsg.includes('timeout')) {
+            throw new Error(
+              'AI service request timed out. Please try a simpler prompt or try again later.'
+            );
+          } else if (errorMsg.includes('API key') || errorMsg.includes('unauthorized')) {
+            throw new Error(
+              'AI service authentication failed. Please contact support.'
+            );
+          } else if (errorMsg.includes('model')) {
+            throw new Error(
+              'AI model configuration error. Please contact support.'
+            );
+          } else {
+            throw new Error(
+              `AI service failed after ${maxRetries} attempts: ${lastError.message}`
+            );
+          }
         }
         
         // Exponential backoff
         const delay = calculateBackoff(attempt);
-        console.log(`Retrying in ${delay}ms...`);
+        console.log(`Retrying AI request in ${delay}ms...`);
         await sleep(delay);
       }
     }
@@ -228,14 +274,35 @@ export class PromptEngine {
    * Requirements:
    * - 1.3: Parse and validate AI responses
    * - 25.7: Validation error logging
+   * - 29.1: User-friendly error messages
+   * - 29.5: Log errors with details
    */
   private parseAIResponse(response: string, originalPrompt: string): UIDocument {
     try {
+      // Log parsing attempt
+      console.log('Parsing AI Response:', {
+        timestamp: new Date().toISOString(),
+        responseLength: response.length,
+        promptLength: originalPrompt.length,
+      });
+      
       // Extract JSON from markdown code blocks if present
       const jsonString = extractJSONFromMarkdown(response);
       
       // Parse JSON
-      const parsed = JSON.parse(jsonString);
+      let parsed;
+      try {
+        parsed = JSON.parse(jsonString);
+      } catch (parseError) {
+        console.error('JSON Parse Error:', {
+          timestamp: new Date().toISOString(),
+          error: parseError instanceof Error ? parseError.message : 'Unknown error',
+          responsePreview: response.substring(0, 200),
+        });
+        throw new Error(
+          'Failed to parse AI response as JSON. The AI may have generated invalid output. Please try rephrasing your prompt.'
+        );
+      }
       
       // Auto-fix common issues
       const fixed = validateAndFixAIResponse(parsed);
@@ -252,18 +319,62 @@ export class PromptEngine {
       fixed.metadata.currentPromptIndex = fixed.metadata.promptHistory.length - 1;
       
       // Validate against Zod schema
-      const validated = UIDocumentSchema.parse(fixed);
+      let validated;
+      try {
+        validated = UIDocumentSchema.parse(fixed);
+      } catch (validationError) {
+        console.error('Schema Validation Error:', {
+          timestamp: new Date().toISOString(),
+          error: validationError,
+          fixedDocument: JSON.stringify(fixed).substring(0, 500),
+        });
+        throw new Error(
+          'AI generated an invalid UI structure. Please try rephrasing your prompt with more specific details.'
+        );
+      }
+      
+      // Log successful parsing
+      console.log('AI Response Parsed Successfully:', {
+        timestamp: new Date().toISOString(),
+        rootId: (validated.root as ComponentNode)?.id,
+        componentCount: this.countComponentsInTree(validated.root as ComponentNode),
+      });
       
       return validated as UIDocument;
     } catch (error) {
-      console.error('Failed to parse AI response:', error);
-      console.error('Response:', response.substring(0, 500));
+      // Enhanced error logging
+      console.error('Failed to parse AI response:', {
+        timestamp: new Date().toISOString(),
+        error: error instanceof Error ? {
+          name: error.name,
+          message: error.message,
+          stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+        } : error,
+        responsePreview: response.substring(0, 500),
+        promptPreview: originalPrompt.substring(0, 200),
+      });
       
-      if (error instanceof Error) {
-        throw new Error(`Failed to parse AI response: ${error.message}`);
+      // Re-throw with user-friendly message if not already enhanced
+      if (error instanceof Error && !error.message.includes('Please try')) {
+        throw new Error(
+          `Failed to parse AI response: ${error.message}. Please try rephrasing your prompt.`
+        );
       }
       throw error;
     }
+  }
+  
+  /**
+   * Helper to count components in a tree
+   */
+  private countComponentsInTree(node: ComponentNode): number {
+    let count = 1; // Count this node
+    if (node.children && Array.isArray(node.children)) {
+      node.children.forEach((child) => {
+        count += this.countComponentsInTree(child as ComponentNode);
+      });
+    }
+    return count;
   }
   
   /**
@@ -330,6 +441,7 @@ export class PromptEngine {
    * 
    * Requirements:
    * - 25.8: Log AI usage per user
+   * - 29.5: Log generation attempts with details
    */
   private logAIUsage(data: {
     userId?: string;
@@ -339,15 +451,42 @@ export class PromptEngine {
     provider: string;
     generationTime: number;
   }): void {
-    // In production, this should write to a database or analytics service
-    console.log('AI Usage:', {
+    // Enhanced logging with structured data
+    const logEntry = {
       timestamp: new Date().toISOString(),
+      event: 'ai_usage',
       userId: data.userId || 'anonymous',
       promptLength: data.prompt.length,
+      promptPreview: data.prompt.substring(0, 100), // First 100 chars for context
       tokensUsed: data.tokensUsed,
       model: data.model,
       provider: data.provider,
       generationTime: data.generationTime,
-    });
+      // Cost estimation (approximate, adjust based on actual pricing)
+      estimatedCost: this.estimateCost(data.tokensUsed, data.provider),
+    };
+    
+    console.log('AI Usage Log:', logEntry);
+    
+    // In production, this should write to a database or analytics service
+    // Examples:
+    // - await db.aiUsageLogs.create({ data: logEntry })
+    // - await analytics.track('ai_usage', logEntry)
+    // - await metrics.recordAIUsage(logEntry)
+  }
+  
+  /**
+   * Estimate cost based on tokens and provider
+   * This is approximate and should be updated with actual pricing
+   */
+  private estimateCost(tokens: number, provider: string): number {
+    // Approximate costs per 1K tokens (as of 2024)
+    const costPer1KTokens = {
+      openai: 0.03, // GPT-4 approximate
+      anthropic: 0.015, // Claude approximate
+    };
+    
+    const rate = costPer1KTokens[provider as keyof typeof costPer1KTokens] || 0.03;
+    return (tokens / 1000) * rate;
   }
 }

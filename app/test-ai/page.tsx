@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import type { UIDocument } from '@/types/ui-schema';
 
 export default function TestAIPage() {
   const [prompt, setPrompt] = useState('');
   const [result, setResult] = useState<{
     success: boolean;
-    uiDocument: unknown;
+    uiDocument: UIDocument;
     tokensUsed: number;
     generationTime: number;
     cached: boolean;
@@ -99,7 +100,7 @@ export default function TestAIPage() {
               <div>
                 <p className="text-sm text-gray-600">Components</p>
                 <p className="text-2xl font-bold">
-                  {(result.uiDocument as any)?.root?.children?.length || 0}
+                  {(result.uiDocument as UIDocument)?.root?.children?.length || 0}
                 </p>
               </div>
             </div>

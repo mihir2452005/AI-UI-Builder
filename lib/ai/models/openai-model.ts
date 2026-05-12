@@ -61,9 +61,27 @@ export class OpenAIModel implements AIModel {
         finishReason: choice.finish_reason ?? 'unknown',
       };
     } catch (error: unknown) {
-      // Provide helpful error messages
-      const err = error as { status?: number; message?: string };
+      // Enhanced error handling with detailed logging
+      // Requirements: 29.1, 29.2, 29.5
       
+      const err = error as { 
+        status?: number; 
+        message?: string;
+        code?: string;
+        type?: string;
+      };
+      
+      // Log error details
+      console.error('OpenAI API Error:', {
+        timestamp: new Date().toISOString(),
+        status: err.status,
+        code: err.code,
+        type: err.type,
+        message: err.message,
+        model: this.modelName,
+      });
+      
+      // Provide specific, actionable error messages
       if (err.status === 404) {
         throw new Error(
           `OpenAI API error: The model '${this.modelName}' does not exist or you do not have access to it. ` +
@@ -84,6 +102,31 @@ export class OpenAIModel implements AIModel {
         );
       }
       
+      if (err.status === 400) {
+        throw new Error(
+          `OpenAI API error: Invalid request. ${err.message || 'Please check your prompt and try again.'}`
+        );
+      }
+      
+      if (err.status === 500 || err.status === 502 || err.status === 503) {
+        throw new Error(
+          `OpenAI API error: Service temporarily unavailable. Please try again in a moment.`
+        );
+      }
+      
+      if (err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND') {
+        throw new Error(
+          `Network error: Unable to connect to OpenAI API. Please check your internet connection.`
+        );
+      }
+      
+      if (err.code === 'ETIMEDOUT' || err.message?.includes('timeout')) {
+        throw new Error(
+          `Request timeout: OpenAI API took too long to respond. Please try again.`
+        );
+      }
+      
+      // Generic error with original message
       if (error instanceof Error) {
         throw new Error(`OpenAI API error: ${error.message}`);
       }
