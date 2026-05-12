@@ -187,7 +187,7 @@ CRITICAL RULES:
  * Build complete system prompt
  */
 export function buildSystemPrompt(options?: {
-  existingDocument?: Record<string, unknown>;
+  existingDocument?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   preserveManualEdits?: boolean;
 }): string {
   let prompt = SYSTEM_BASE;

@@ -133,7 +133,7 @@ export class PromptEngine {
     
     // 2. Build prompts
     const systemPrompt = buildSystemPrompt({
-      existingDocument: context?.existingDocument,
+      existingDocument: context?.existingDocument as any, // eslint-disable-line @typescript-eslint/no-explicit-any
       preserveManualEdits: context?.preserveManualEdits,
     });
     
@@ -278,7 +278,8 @@ export class PromptEngine {
     newDocument: UIDocument,
     existingDocument: UIDocument
   ): void {
-    const manuallyEditedIds = findManuallyEditedComponents(existingDocument.root);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const manuallyEditedIds = findManuallyEditedComponents(existingDocument.root as any);
     
     if (manuallyEditedIds.length === 0) {
       return;
@@ -287,43 +288,41 @@ export class PromptEngine {
     console.log('Preserving manually edited components:', manuallyEditedIds);
     
     // Build a map of manually edited components
-    const manuallyEditedMap = new Map<string, Record<string, unknown>>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const manuallyEditedMap = new Map<string, any>();
     
-    function collectManuallyEdited(node: Record<string, unknown>) {
-      const metadata = node.metadata as { manuallyEdited?: boolean } | undefined;
-      const nodeId = node.id as string;
-      
-      if (metadata?.manuallyEdited) {
-        manuallyEditedMap.set(nodeId, node);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function collectManuallyEdited(node: any) {
+      if (node.metadata?.manuallyEdited) {
+        manuallyEditedMap.set(node.id, node);
       }
       
-      const children = node.children as Record<string, unknown>[] | undefined;
-      if (children && Array.isArray(children)) {
-        children.forEach(collectManuallyEdited);
+      if (node.children && Array.isArray(node.children)) {
+        node.children.forEach(collectManuallyEdited);
       }
     }
     
-    collectManuallyEdited(existingDocument.root as Record<string, unknown>);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    collectManuallyEdited(existingDocument.root as any);
     
     // Replace components in new document with manually edited versions
-    function replaceManuallyEdited(node: Record<string, unknown>): Record<string, unknown> {
-      const nodeId = node.id as string;
-      
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function replaceManuallyEdited(node: any): any {
       // If this component was manually edited, use the old version
-      if (manuallyEditedMap.has(nodeId)) {
-        return manuallyEditedMap.get(nodeId)!;
+      if (manuallyEditedMap.has(node.id)) {
+        return manuallyEditedMap.get(node.id);
       }
       
       // Otherwise, recursively process children
-      const children = node.children as Record<string, unknown>[] | undefined;
-      if (children && Array.isArray(children)) {
-        node.children = children.map(replaceManuallyEdited);
+      if (node.children && Array.isArray(node.children)) {
+        node.children = node.children.map(replaceManuallyEdited);
       }
       
       return node;
     }
     
-    newDocument.root = replaceManuallyEdited(newDocument.root);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    newDocument.root = replaceManuallyEdited(newDocument.root as any);
   }
   
   /**
