@@ -96,6 +96,7 @@ export async function GET(
     // Count components
     let componentCount = 0;
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const uiDoc = project.uiDocument as any;
       if (uiDoc && uiDoc.root) {
         componentCount = countComponents(uiDoc.root);
@@ -113,7 +114,7 @@ export async function GET(
       updatedAt: project.updatedAt.toISOString(),
       componentCount,
       userId: project.userId,
-      uiDocument: project.uiDocument as any,
+      uiDocument: project.uiDocument as any, // eslint-disable-line @typescript-eslint/no-explicit-any
       createdAt: project.createdAt.toISOString(),
     };
     
@@ -223,7 +224,8 @@ export async function PATCH(
     let validatedData;
     try {
       validatedData = validateRequest(UpdateProjectSchema, body);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { errors?: unknown[] };
       return NextResponse.json(
         {
           success: false,
@@ -231,7 +233,7 @@ export async function PATCH(
             code: 'VALIDATION_ERROR',
             message: 'Invalid request data',
             details: {
-              errors: error.errors || [],
+              errors: err.errors || [],
             },
             statusCode: 400,
           },
@@ -242,6 +244,7 @@ export async function PATCH(
     }
     
     // Build update data (only include fields that were provided)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateData: any = {};
     
     if (validatedData.name !== undefined) {
@@ -253,6 +256,7 @@ export async function PATCH(
     }
     
     if (validatedData.uiDocument !== undefined) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       updateData.uiDocument = validatedData.uiDocument as any;
     }
     
@@ -271,6 +275,7 @@ export async function PATCH(
     // Count components
     let componentCount = 0;
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const uiDoc = updatedProject.uiDocument as any;
       if (uiDoc && uiDoc.root) {
         componentCount = countComponents(uiDoc.root);
@@ -288,7 +293,7 @@ export async function PATCH(
       updatedAt: updatedProject.updatedAt.toISOString(),
       componentCount,
       userId: updatedProject.userId,
-      uiDocument: updatedProject.uiDocument as any,
+      uiDocument: updatedProject.uiDocument as any, // eslint-disable-line @typescript-eslint/no-explicit-any
       createdAt: updatedProject.createdAt.toISOString(),
     };
     
@@ -441,6 +446,7 @@ export async function DELETE(
 /**
  * Helper function to count components in a component tree
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function countComponents(node: any): number {
   if (!node) return 0;
   

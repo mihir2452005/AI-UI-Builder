@@ -71,6 +71,7 @@ export async function GET(_request: NextRequest) {
       // Count components in the UI document
       let componentCount = 0;
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const uiDoc = project.uiDocument as any;
         if (uiDoc && uiDoc.root) {
           componentCount = countComponents(uiDoc.root);
@@ -153,7 +154,8 @@ export async function POST(request: NextRequest) {
     let validatedData;
     try {
       validatedData = validateRequest(SaveProjectSchema, body);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { errors?: unknown[] };
       return NextResponse.json(
         {
           success: false,
@@ -161,7 +163,7 @@ export async function POST(request: NextRequest) {
             code: 'VALIDATION_ERROR',
             message: 'Invalid request data',
             details: {
-              errors: error.errors || [],
+              errors: err.errors || [],
             },
             statusCode: 400,
           },
@@ -180,7 +182,7 @@ export async function POST(request: NextRequest) {
         name: validatedData.name,
         description: validatedData.description || null,
         userId: session.user.id,
-        uiDocument: emptyUIDocument as any, // Prisma Json type
+        uiDocument: emptyUIDocument as any, // eslint-disable-line @typescript-eslint/no-explicit-any
       },
     });
     
@@ -229,6 +231,7 @@ export async function POST(request: NextRequest) {
 /**
  * Helper function to count components in a component tree
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function countComponents(node: any): number {
   if (!node) return 0;
   

@@ -15,10 +15,11 @@ export default function TestProjectsPage() {
   const [projectId, setProjectId] = useState<string>('');
   const router = useRouter();
 
-  const log = (message: string, data?: any) => {
+  const log = (message: string, data?: unknown) => {
     const timestamp = new Date().toLocaleTimeString();
     const logMessage = `[${timestamp}] ${message}${data ? '\n' + JSON.stringify(data, null, 2) : ''}`;
     setOutput((prev) => prev + '\n\n' + logMessage);
+    // eslint-disable-next-line no-console
     console.log(message, data);
   };
 
@@ -174,7 +175,7 @@ export default function TestProjectsPage() {
             Project API Test Page
           </h1>
           <p className="text-gray-600">
-            Test the project management API routes. Make sure you're signed in first.
+            Test the project management API routes. Make sure you&apos;re signed in first.
           </p>
           <button
             onClick={() => router.push('/dashboard')}
