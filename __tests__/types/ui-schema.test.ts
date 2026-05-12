@@ -12,8 +12,6 @@ import type {
   ResponsiveStyles,
   DesignTokens,
   PromptHistoryEntry,
-  ComponentProps,
-  ComponentMetadata,
 } from '@/types/ui-schema';
 
 describe('UI Schema Types', () => {

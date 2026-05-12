@@ -7,7 +7,6 @@
 import {
   GenerateUISchema,
   SaveProjectSchema,
-  UpdateProjectSchema,
   ExportCodeSchema,
   RegisterSchema,
   UIDocumentSchema,
