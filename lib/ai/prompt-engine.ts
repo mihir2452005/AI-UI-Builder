@@ -287,30 +287,37 @@ export class PromptEngine {
     console.log('Preserving manually edited components:', manuallyEditedIds);
     
     // Build a map of manually edited components
-    const manuallyEditedMap = new Map<string, any>();
+    const manuallyEditedMap = new Map<string, Record<string, unknown>>();
     
-    function collectManuallyEdited(node: any) {
-      if (node.metadata?.manuallyEdited) {
-        manuallyEditedMap.set(node.id, node);
+    function collectManuallyEdited(node: Record<string, unknown>) {
+      const metadata = node.metadata as { manuallyEdited?: boolean } | undefined;
+      const nodeId = node.id as string;
+      
+      if (metadata?.manuallyEdited) {
+        manuallyEditedMap.set(nodeId, node);
       }
       
-      if (node.children && Array.isArray(node.children)) {
-        node.children.forEach(collectManuallyEdited);
+      const children = node.children as Record<string, unknown>[] | undefined;
+      if (children && Array.isArray(children)) {
+        children.forEach(collectManuallyEdited);
       }
     }
     
-    collectManuallyEdited(existingDocument.root);
+    collectManuallyEdited(existingDocument.root as Record<string, unknown>);
     
     // Replace components in new document with manually edited versions
-    function replaceManuallyEdited(node: any): any {
+    function replaceManuallyEdited(node: Record<string, unknown>): Record<string, unknown> {
+      const nodeId = node.id as string;
+      
       // If this component was manually edited, use the old version
-      if (manuallyEditedMap.has(node.id)) {
-        return manuallyEditedMap.get(node.id);
+      if (manuallyEditedMap.has(nodeId)) {
+        return manuallyEditedMap.get(nodeId)!;
       }
       
       // Otherwise, recursively process children
-      if (node.children && Array.isArray(node.children)) {
-        node.children = node.children.map(replaceManuallyEdited);
+      const children = node.children as Record<string, unknown>[] | undefined;
+      if (children && Array.isArray(children)) {
+        node.children = children.map(replaceManuallyEdited);
       }
       
       return node;

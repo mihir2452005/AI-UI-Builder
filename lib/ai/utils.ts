@@ -9,6 +9,7 @@
  */
 
 import { createHash } from 'crypto';
+import { nanoid } from 'nanoid';
 import type { UIDocument } from '@/types/ui-schema';
 
 /**
@@ -18,7 +19,7 @@ import type { UIDocument } from '@/types/ui-schema';
  * @param context - Optional context (projectId, etc.)
  * @returns Cache key string
  */
-export function getCacheKey(prompt: string, context?: Record<string, any>): string {
+export function getCacheKey(prompt: string, context?: Record<string, unknown>): string {
   const data = JSON.stringify({ prompt, context });
   const hash = createHash('sha256').update(data).digest('hex');
   return `prompt:${hash}`;
@@ -86,8 +87,7 @@ export function calculateBackoff(attempt: number, baseDelay: number = 1000): num
  * @param uiDocument - UIDocument to validate and fix
  * @returns Fixed UIDocument
  */
-export function validateAndFixAIResponse(uiDocument: any): UIDocument {
-  const { nanoid } = require('nanoid');
+export function validateAndFixAIResponse(uiDocument: UIDocument | Record<string, unknown>): UIDocument {
   const now = new Date().toISOString();
   
   // Fix root component
@@ -96,7 +96,7 @@ export function validateAndFixAIResponse(uiDocument: any): UIDocument {
   }
   
   // Recursively fix component nodes
-  function fixComponentNode(node: any): any {
+  function fixComponentNode(node: Record<string, unknown>): Record<string, unknown> {
     // Generate ID if missing
     if (!node.id) {
       node.id = nanoid();
@@ -200,10 +200,10 @@ export function validateAndFixAIResponse(uiDocument: any): UIDocument {
  * @param root - Root component node
  * @returns Array of component IDs that are manually edited
  */
-export function findManuallyEditedComponents(root: any): string[] {
+export function findManuallyEditedComponents(root: Record<string, unknown>): string[] {
   const manuallyEdited: string[] = [];
   
-  function traverse(node: any) {
+  function traverse(node: Record<string, unknown>) {
     if (node.metadata?.manuallyEdited) {
       manuallyEdited.push(node.id);
     }

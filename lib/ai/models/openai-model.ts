@@ -60,9 +60,11 @@ export class OpenAIModel implements AIModel {
         model: completion.model,
         finishReason: choice.finish_reason ?? 'unknown',
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Provide helpful error messages
-      if (error.status === 404) {
+      const err = error as { status?: number; message?: string };
+      
+      if (err.status === 404) {
         throw new Error(
           `OpenAI API error: The model '${this.modelName}' does not exist or you do not have access to it. ` +
           `Try using 'gpt-4o-mini' or 'gpt-3.5-turbo' instead. ` +
@@ -70,13 +72,13 @@ export class OpenAIModel implements AIModel {
         );
       }
       
-      if (error.status === 401) {
+      if (err.status === 401) {
         throw new Error(
           `OpenAI API error: Invalid API key. Please check your OPENAI_API_KEY environment variable.`
         );
       }
       
-      if (error.status === 429) {
+      if (err.status === 429) {
         throw new Error(
           `OpenAI API error: Rate limit exceeded. Please try again later or upgrade your OpenAI plan.`
         );

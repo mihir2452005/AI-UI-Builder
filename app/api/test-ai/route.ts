@@ -35,13 +35,16 @@ export async function POST(request: NextRequest) {
       generationTime: result.generationTime,
       cached: result.cached,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to generate UI';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
     console.error('AI generation error:', error);
     
     return NextResponse.json(
       { 
-        error: error.message || 'Failed to generate UI',
-        details: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? errorStack : undefined,
       },
       { status: 500 }
     );

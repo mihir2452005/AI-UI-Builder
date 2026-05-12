@@ -9,6 +9,7 @@
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-var-requires": "error",
     "react-hooks/exhaustive-deps": "warn",
     "no-console": ["warn", { "allow": ["warn", "error", "info"] }]
   },
@@ -28,9 +29,15 @@
       }
     },
     {
-      "files": ["lib/auth/auth-options.ts"],
+      "files": [
+        "lib/auth/auth-options.ts",
+        "lib/ai/**/*.ts",
+        "app/api/test-ai/**/*.ts",
+        "app/test-ai/**/*.tsx"
+      ],
       "rules": {
-        "no-console": "off"
+        "no-console": "off",
+        "@typescript-eslint/no-explicit-any": "warn"
       }
     }
   ]

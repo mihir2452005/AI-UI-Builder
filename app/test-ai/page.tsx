@@ -4,7 +4,13 @@ import { useState } from 'react';
 
 export default function TestAIPage() {
   const [prompt, setPrompt] = useState('');
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<{
+    success: boolean;
+    uiDocument: unknown;
+    tokensUsed: number;
+    generationTime: number;
+    cached: boolean;
+  } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,8 +35,9 @@ export default function TestAIPage() {
       }
 
       setResult(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

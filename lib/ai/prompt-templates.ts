@@ -187,7 +187,7 @@ CRITICAL RULES:
  * Build complete system prompt
  */
 export function buildSystemPrompt(options?: {
-  existingDocument?: any;
+  existingDocument?: Record<string, unknown>;
   preserveManualEdits?: boolean;
 }): string {
   let prompt = SYSTEM_BASE;
