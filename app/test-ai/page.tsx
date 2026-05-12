@@ -99,7 +99,7 @@ export default function TestAIPage() {
               <div>
                 <p className="text-sm text-gray-600">Components</p>
                 <p className="text-2xl font-bold">
-                  {result.uiDocument?.root?.children?.length || 0}
+                  {(result.uiDocument as any)?.root?.children?.length || 0}
                 </p>
               </div>
             </div>
